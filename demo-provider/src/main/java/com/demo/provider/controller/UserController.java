@@ -1,7 +1,7 @@
 package com.demo.provider.controller;
 
 import com.demo.common.util.CommonResponse;
-import com.demo.provider.controller.dto.User;
+import com.demo.provider.dto.User;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
