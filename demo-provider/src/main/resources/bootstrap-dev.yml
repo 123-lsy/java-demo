@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        namespace: ee9a7297-5785-4396-8568-3e2d390fa979
+        group: java-demo
+        file-extension: yaml
+        refresh-enabled: true
+      discovery:
+        server-addr: localhost:8848
+        namespace: ee9a7297-5785-4396-8568-3e2d390fa979
+        group: java-demo
+  application:
+    name: demo-provider
