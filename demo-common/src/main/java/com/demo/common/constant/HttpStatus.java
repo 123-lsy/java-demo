@@ -1,6 +1,4 @@
-package com.demo.common.Enum;
-
-import lombok.Data;
+package com.demo.common.constant;
 
 public interface HttpStatus {
     /**

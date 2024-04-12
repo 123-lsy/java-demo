@@ -9,7 +9,7 @@ package com.demo.common.util; /**
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.demo.common.Enum.HttpStatus;
+import com.demo.common.constant.HttpStatus;
 
 /**
  * @author wanghuihui
