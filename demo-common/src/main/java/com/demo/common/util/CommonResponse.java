@@ -40,6 +40,9 @@ public class CommonResponse<T> {
     public static <T> CommonResponse<T> fail(){
         return new CommonResponse<>(HttpStatus.FAILURE, null, null);
     }
+    public static <T> CommonResponse<T> fail(String msg){
+        return new CommonResponse<>(HttpStatus.FAILURE, msg, null);
+    }
 
     public Integer getCode() {
         return code;
