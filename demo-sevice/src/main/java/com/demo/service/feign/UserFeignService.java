@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient("demo-provider")
 public interface UserFeignService {
 
-    @RequestMapping("demo/provider/getUser")
+    @RequestMapping("/demo/provider/getUser")
     CommonResponse<Object> getUser();
 }

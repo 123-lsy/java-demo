@@ -13,3 +13,6 @@ spring:
         group: java-demo
   application:
     name: demo-provider
+provider:
+  user:
+    name: local
