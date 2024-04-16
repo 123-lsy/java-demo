@@ -56,11 +56,27 @@ public class RedisConfig {
 > redis中可以支持 string, list, hash,set, zset五种数据类型，这五种数据格式的常用API都在RedisTemplate这个类中进行了封装。为了方便开发，通常都会定义一个工具类，在使用的时候直接注入这个工具类
 
 ```java
+package com.demo.provider.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.*;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 @Component
 @Slf4j
 public class RedisUtil {
+
+
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 写入缓存
@@ -72,7 +88,7 @@ public class RedisUtil {
     public boolean set(final String key, Object value) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
             result = true;
         } catch (Exception e) {
@@ -91,7 +107,7 @@ public class RedisUtil {
     public boolean set(final String key, Object value, Long expireTime, TimeUnit timeUnit) {
         boolean result = false;
         try {
-            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            ValueOperations<String, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
             redisTemplate.expire(key, expireTime, timeUnit);
             result = true;
@@ -118,7 +134,7 @@ public class RedisUtil {
      * @param pattern
      */
     public void removePattern(final String pattern) {
-        Set<Serializable> keys = redisTemplate.keys(pattern);
+        Set<String> keys = redisTemplate.keys(pattern);
         if (keys.size() > 0) {
             redisTemplate.delete(keys);
         }
@@ -153,7 +169,7 @@ public class RedisUtil {
      */
     public Object get(final String key) {
         Object result = null;
-        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         result = operations.get(key);
         return result;
     }
@@ -262,12 +278,12 @@ public class RedisUtil {
         return redisTemplate.opsForValue().increment(key, 1L);
     }
 
-    public Boolean setIfAbsent(String key, Object value, Long timeout) {
+    public Boolean setIfAbsent(String key, Object value, Long timeout, TimeUnit unit) {
         Boolean result = true;
 
         try {
-            if (timeout == null) {
-                result = this.redisTemplate.opsForValue().setIfAbsent(key, value);
+            if (unit == null) {
+                result = this.redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.MILLISECONDS);
             } else {
                 result = this.redisTemplate.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.SECONDS);
             }
@@ -284,7 +300,31 @@ public class RedisUtil {
 
 ### 3.1 缓存
 
+```java
+    @Autowired
+    RedisUtil redisUtil;
+    
+    @RequestMapping("/setByUtil")
+    public CommonResponse<Object> setByUtil(){
+        User user = new User();
+        user.setId(5);
+        user.setName("王五");
+        user.setPhone(123124324);
+        redisUtil.set(key+user.getId(), user, 24L, TimeUnit.HOURS);
+        return CommonResponse.success(user, "success");
+    }
+```
+
 ### 3.2 自增主键
+
+```java
+    @RequestMapping("/setIncrement")
+    public CommonResponse<Object> setIncrement(){
+        String key = "demo:provider:seq";
+        long l = redisUtil.incrementAndGet(key);
+        return CommonResponse.success(l, "success");
+    }
+```
 
 ###  3.3 分布式锁
 
@@ -305,7 +345,37 @@ public class RedisUtil {
 >- 没有获得锁的线程, 如果不想退出,需要手动实现自旋
 >- 误删 key , 第二个线程刚刚获得到锁 ,  第一个线程删除了锁
 
-可在定时任务中使用, 防止任务重复执行,将过期时间定的长一些,就不会有上面的隐患
+可在定时任务中使用, 防止任务重复执行,将过期时间定的长一些,就不会有锁过期未执行完成和误删key的隐患
+
+```java
+ 
+@XxlJob("xxlJobHandler")
+    public ReturnT<String> syncProToBasic(String param) {
+        log.info("xxlJobHandler start");
+        XxlJobLogger.log("xxlJobHandler start，时间为：{}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        String key = "KEY_NAME";
+        //防重复锁,15分钟
+        Boolean acquire = redisTemplate.opsForValue().setIfAbsent(key, System.currentTimeMillis(), 900L, TimeUnit.SECONDS);
+        if (acquire) {
+            try {
+             //业务逻辑
+             //....
+            } catch (BizException e) {
+                log.info("xxlJobHandler任务执行失败，原因：{}", e.getMessage());
+                return ReturnT.FAIL;
+            } finally {
+                //解锁
+                redisTemplate.delete(key);
+            }
+        } else {
+            log.info("xxlJobHandler 加锁失败，不处理");
+            return ReturnT.FAIL;
+        }
+        XxlJobLogger.log("xxlJobHandler end，时间为：{}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        log.info("xxlJobHandler end");
+        return ReturnT.SUCCESS;
+    }
+```
 
 #### 3.3.2 Redisson 分布式锁
 
@@ -332,7 +402,7 @@ public class RedissonConfig {
        //1、创建配置
         Config config = new Config();
         //使用单节点模式
-        config.useSingleServer().setAddress("redis://192.168.236.130:6379");
+        config.useSingleServer().setAddress("redis://XXXX:6379");
 
         //2、根据Config创建出RedissonClient实例
         //Redis url should start with redis:// or rediss://

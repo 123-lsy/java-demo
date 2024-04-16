@@ -47,13 +47,17 @@ public class RedisController {
         return CommonResponse.success(user, "success");
     }
 
+    /**
+     * 缓存
+     * @return
+     */
     @RequestMapping("/setByUtil")
     public CommonResponse<Object> setByUtil(){
         User user = new User();
         user.setId(5);
         user.setName("王五");
         user.setPhone(123124324);
-        redisUtil.set(key+user.getId(), user, 60L, TimeUnit.SECONDS);
+        redisUtil.set(key+user.getId(), user, 24L, TimeUnit.HOURS);
         return CommonResponse.success(user, "success");
     }
     @RequestMapping("/getByUtil")
@@ -73,7 +77,7 @@ public class RedisController {
     }
 
     /**
-     * redisTemplate 占用的锁可以用来
+     * redisTemplate 占用的锁可以用来防止定时任务重复执行
      * @return
      */
     @RequestMapping("/lock")

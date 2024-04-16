@@ -5,7 +5,9 @@
 > - 3、调度中心HA（中心式）：调度采用中心式设计，“调度中心”自研调度组件并支持集群部署，可保证调度中心HA；
 > - 4、执行器HA（分布式）：任务分布式执行，任务"执行器"支持**集群部署**，可保证任务执行HA；
 
-[官方中文文档](https://www.xuxueli.com/xxl-job)
+搭建服务端和更详细的内容可见 : [官方中文文档](https://www.xuxueli.com/xxl-job)
+
+xxl-job的服务端的核心部分主要是任务管理和执行器管理 , 创建好执行器后,  再创建任务, 任务是由执行器来执行的 ,架构图如下:
 
 ![image-20240410181433904](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240410181433904.png)
 
@@ -22,6 +24,8 @@
 ## 2.执行器部署
 
 ### 步骤一:nacos配置
+
+放在nacos中的配置的value值不能为空, 否则读取key时会报空指针异常, 默认值可以为空字符串, 如下列的 ip 的值:
 
 ```java
 xxl:
@@ -109,6 +113,10 @@ public class HelloWord {
 ### 步骤二: 新建任务
 
 ![image-20240411183159627](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240411183159627.png)
+
+### 步骤三: 手动触发或启动
+
+![image-20240416091517793](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240416091517793.png)
 
 
 

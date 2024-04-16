@@ -4,31 +4,37 @@
 
 ### 一、创建 SpringBoot 工程
 
-①. 创建Maven工程
+①. 创建Maven工程 - Spring Initializer在社区版本是收费的
+
+社区版本的 IDEA 创建 Spring Boot 工程可选取 maven-archetype-quickstart 快速搭建
+
+
+![image-20240416105349266](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240416105349266.png)
 
 ②. 导入spring-boot-stater-web起步依赖
 
-③. 编写Controller 
+ ```java
+<dependency>  
+<groupId>org.springframework.boot</groupId>   
+<artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+ ```
+
+③.调整工程架构并提供启动类
+
+![ 	](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240416110057588.png)![image-20240416111115930](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240416111115930.png)
+
+
 
 ④. 提供启动类
-
-#### spring boot 起步依赖-maven坐标
-
- ```
- <dependency>  
- <groupId>org.springframework.boot</groupId>   
- <artifactId>spring-boot-starter-web</artifactId>
- </dependency>
- ```
-
-#### 启动类
 
 ```java
 //启动类
 @SpringBootApplication
-public class SpringbootQuickstartApplication {  
-          public static void main(String[] args) {            SpringApplication.run(SpringbootQuickstartApplication.class, args);
-          }
+public class OrderApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderApplication.class, args);
+    }
 }
 ```
 
