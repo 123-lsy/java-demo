@@ -13,11 +13,12 @@ import java.util.function.Consumer;
 public class KafkaConsumerController {
 
     @KafkaListener(topics = {"test"})
-    public void listen1(ConsumerRecord<String, Object> consumerRecord, Acknowledgment ack) {
+    public void listen1(ConsumerRecord<String, Object> record, Acknowledgment ack) {
         try {
             //用于测试异常处理
             //int i = 1 / 0;
-            System.out.println(consumerRecord);
+            System.out.println("简单消费：" + record.topic() + "-" + record.partition() + "=" +
+                    record.value());
         } catch (Exception e) {
             System.out.println("消费失败：" + e);
         }finally {
@@ -25,4 +26,5 @@ public class KafkaConsumerController {
             ack.acknowledge();
         }
     }
+
 }

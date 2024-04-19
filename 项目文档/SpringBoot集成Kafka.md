@@ -24,7 +24,7 @@ spring:
       # Kafka服务器
       bootstrap-servers: 175.24.228.202:9092
       # 开启事务，必须在开启了事务的方法中发送，否则报错
-      transaction-id-prefix: kafkaTx-
+      # transaction-id-prefix: kafkaTx-
       # 发生错误后，消息重发的次数，开启事务必须设置大于0。
       retries: 3
       # acks=0 ： 生产者在成功写入消息之前不会等待任何来自服务器的响应。
@@ -280,5 +280,112 @@ public class KafkaConsumerConfig {
 }
 ```
 
-## 3.应用
+## 3.简单应用
 
+- 简单生产消息
+
+  ```java
+      @Autowired
+      private KafkaTemplate<Object, Object> kafkaTemplate;
+  
+      @GetMapping("/send")
+      public CommonResponse<Object> sender(){
+          String msg = "hello world!";
+          kafkaTemplate.send("test", msg);
+          return CommonResponse.success(null, "success");
+      }
+  ```
+
+- 简单消费消息
+
+  ```java
+      @KafkaListener(topics = {"test"})
+      public void listen1(ConsumerRecord<String, Object> consumerRecord, Acknowledgment ack) {
+          try {
+              //用于测试异常处理
+              //int i = 1 / 0;
+              System.out.println(consumerRecord);
+          } catch (Exception e) {
+              System.out.println("消费失败：" + e);
+          }finally {
+              //手动确认
+              ack.acknowledge();
+          }
+      }
+  ```
+
+### 3.1 消息不丢失--回调/重试/确认
+
+```
+    @Transactional
+    @GetMapping("/send/callback")
+    public CommonResponse<Object> callback(){
+        String msg = "hello world!";
+        kafkaTemplate.send("test", msg).addCallback(new SuccessCallback<SendResult<Object, Object>>() {
+            @Override
+            public void onSuccess(SendResult<Object, Object> objectObjectSendResult) {
+                log.info("消息发送成功");
+            }
+        }, new FailureCallback() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                log.error("消息发送失败:{}, topic:{}, msg:{}", throwable.getCause(), "test", msg);
+                //补偿机制
+            }
+        });
+        return CommonResponse.success(null, "success");
+
+    }
+```
+
+### 3.2 消息事务
+
+```
+      # 开启事务，必须在开启了事务的方法中发送，否则报错
+      # transaction-id-prefix: kafkaTx-
+```
+
+- 方法一:
+
+  ```java
+      @GetMapping("/send/transaction")
+      public CommonResponse<Object> transaction(){
+          kafkaTemplate.executeInTransaction(operations -> {
+            operations.send("test", "kafka事务消息发送");
+            int i  = 1/0;
+            operations.send("test", "kafka事务消息发送2");
+            return true;
+          });
+          return CommonResponse.success(null, "success");
+      }
+  ```
+
+- 方法二: 注入KafkaTransactionManager
+
+  ```
+      @Bean
+      public ProducerFactory<Object, Object> producerFactory() {
+          DefaultKafkaProducerFactory<Object, Object> factory = new DefaultKafkaProducerFactory<>(producerConfigs());
+          //开启事务，会导致 LINGER_MS_CONFIG 配置失效
+         // factory.setTransactionIdPrefix(transactionIdPrefix);
+          return factory;
+      }
+  
+      @Bean
+      public KafkaTransactionManager<Object, Object> kafkaTransactionManager(ProducerFactory<Object, Object> producerFactory) {
+          return new KafkaTransactionManager<>(producerFactory);
+      }
+  ```
+
+  然后在方法上加上@Transactional
+  ```
+      @Transactional
+      @GetMapping("/send")
+      public CommonResponse<Object> sender(){
+          String msg = "hello world!";
+          kafkaTemplate.send("test", msg);
+          return CommonResponse.success(null, "success");
+      }
+  ```
+
+  

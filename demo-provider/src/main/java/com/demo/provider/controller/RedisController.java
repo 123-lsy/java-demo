@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,9 +61,10 @@ public class RedisController {
         redisUtil.set(key+user.getId(), user, 24L, TimeUnit.HOURS);
         return CommonResponse.success(user, "success");
     }
-    @RequestMapping("/getByUtil")
-    public CommonResponse<Object> getByUtil(Integer id){
-        return CommonResponse.success(redisUtil.get(key + id), "success");
+    @RequestMapping("/getByUtil/{id}")
+    public CommonResponse<Object> getByUtil(@PathVariable("id") Integer id){
+        User user = (User) redisUtil.get(key + id);
+        return CommonResponse.success(user, "success");
     }
 
     /**
