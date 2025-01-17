@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.sleep;
@@ -64,6 +65,7 @@ public class RedisController {
     @RequestMapping("/getByUtil/{id}")
     public CommonResponse<Object> getByUtil(@PathVariable("id") Integer id){
         User user = (User) redisUtil.get(key + id);
+        redisUtil.remove();
         return CommonResponse.success(user, "success");
     }
 

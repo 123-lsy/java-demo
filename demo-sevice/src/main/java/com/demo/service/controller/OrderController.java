@@ -15,6 +15,7 @@ public class OrderController {
 
     @RequestMapping("/feign")
     public CommonResponse<Object> feign(){
-        return CommonResponse.success(feignService.getUser(), "success");
+        String name = "123";
+        return CommonResponse.success(feignService.getUser(name), "success");
     }
 }

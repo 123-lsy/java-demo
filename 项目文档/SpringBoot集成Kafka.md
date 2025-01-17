@@ -1,4 +1,4 @@
-SpringBoot集成Kafka
+# SpringBoot集成Kafka
 
 ## 1.引入依赖
 
@@ -342,7 +342,7 @@ public class KafkaConsumerConfig {
 
 ```
       # 开启事务，必须在开启了事务的方法中发送，否则报错
-      # transaction-id-prefix: kafkaTx-
+      transaction-id-prefix: kafkaTx-
 ```
 
 - 方法一:

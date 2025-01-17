@@ -12,12 +12,21 @@
 ![image-20240416105349266](C:\Users\mi\AppData\Roaming\Typora\typora-user-images\image-20240416105349266.png)
 
 ②. 导入spring-boot-stater-web起步依赖
+```java
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.9.RELEASE</version>
+    </parent>
+```
 
  ```java
-<dependency>  
-<groupId>org.springframework.boot</groupId>   
-<artifactId>spring-boot-starter-web</artifactId>
-</dependency>
+     
+      <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.3.9.RELEASE</version>
+        </dependency>
  ```
 
 ③.调整工程架构并提供启动类
@@ -61,12 +70,12 @@ public class OrderApplication {
 
 - 自定义的Bean
 
-| 注解        | 说明                 | 位置                                            |
-| ----------- | -------------------- | ----------------------------------------------- |
-| @Component  | 声明bean的基础注解   | 不属于以下三类时，用此注解                      |
-| @Controller | @Component的衍生注解 | 标注在控制器类上                                |
-| @Service    | @Component的衍生注解 | 标注在业务类上                                  |
-| @Repository | @Component的衍生注解 | 标注在数据访问类上（由于与mybatis整合，用的少） |
+| 注解                | 说明                 | 位置                                            |
+| ------------------- | -------------------- | ----------------------------------------------- |
+| @Component          | 声明bean的基础注解   | 不属于以下三类时，用此注解                      |
+| @Controller         | @Component的衍生注解 | 标注在控制器类上                                |
+| @Service            | @Component的衍生注解 | 标注在业务类上                                  |
+| @Repository @Mapper | @Component的衍生注解 | 标注在数据访问类上（由于与mybatis整合，用的少） |
 
 - 第三方的Bean（如果要注册的bean对象来自于第三方（不是自定义的），是无法用 @Component 及衍生注解声明bean的）
 

@@ -11,6 +11,7 @@
         <module>demo-common</module>
         <module>demo-provider</module>
         <module>demo-sevice</module>
+        <module>thread</module>
     </modules>
     <packaging>pom</packaging>
 

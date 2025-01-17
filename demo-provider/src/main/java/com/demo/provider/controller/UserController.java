@@ -9,6 +9,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -22,7 +23,7 @@ public class UserController {
     private String name;
 
     @RequestMapping("/getUser")
-    public CommonResponse<Object> getUser(){
+    public CommonResponse<Object> getUser(@RequestParam("rpc") String rpc){
         User user = new User();
         user.setName("里");
         user.setPhone(123124324);
@@ -36,6 +37,11 @@ public class UserController {
 
     @RequestMapping("/setCache")
     public CommonResponse<Object> setCache(){
+        return CommonResponse.success(name, "success");
+    }
+
+    @RequestMapping("/name")
+    public CommonResponse<Object> getName(){
         return CommonResponse.success(name, "success");
     }
 }
